@@ -3,11 +3,13 @@
 	import { onMount } from 'svelte';
 	import axios from 'axios';
 	import * as qs from 'qs'; // 2
+
 	let stateLoading = true;
 	let stateArticles = null;
 	let stateMeta = null;
 	let stateCurrentPageNumber = 1;
-	let stateCurrentPageSize = 20; // 3
+	let stateCurrentPageSize = 3; // 3
+
 	async function getArticles(pageNumber, pageSize) {
 		const query = qs.stringify(
 			{
@@ -20,12 +22,15 @@
 				encodeValuesOnly: true
 			}
 		);
+
 		const res = await axios.get(`http://localhost:1337/api/articles?${query}`);
+
 		return {
 			articles: res.data.data,
 			meta: res.data.meta
 		};
 	} // 4
+
 	async function updateArticlesByPage(pageNumber) {
 		stateLoading = true;
 		stateCurrentPageNumber = pageNumber;
@@ -34,6 +39,7 @@
 		stateMeta = meta;
 		stateLoading = false;
 	} // 5
+
 	onMount(async () => {
 		await updateArticlesByPage(stateCurrentPageNumber);
 	});
@@ -84,6 +90,7 @@
 					on:click|preventDefault={() => updateArticlesByPage(--stateCurrentPageNumber)}
 					disabled={stateMeta.pagination.page === 1}>Previous</button
 				>
+
 				<!-- 4 -->
 				<div class="pagination">
 					{#each { length: stateMeta.pagination.pageCount } as _, p}
@@ -93,6 +100,7 @@
 						>
 					{/each}
 				</div>
+
 				<!-- 5 -->
 				<button
 					on:click|preventDefault={() => updateArticlesByPage(++stateCurrentPageNumber)}
